@@ -128,11 +128,16 @@
   const timerLeft = document.getElementById('timer-left');
   const timerRight = document.getElementById('timer-right');
 
-  let leftTimerInterval, rightTimerInterval;
-  let leftTimer = 0, rightTimer = 0;
+  let leftTimer = { seconds: 0, interval: null };
+  let rightTimer = { seconds: 0, interval: null };
 
   function startTimer(timerElement, timerVariable) {
-    clearInterval(timerVariable.interval);
+    // Clear any existing interval
+    if (timerVariable.interval) {
+      clearInterval(timerVariable.interval);
+    }
+
+    // Reset the timer and start a new interval
     timerVariable.seconds = 0;
     timerVariable.interval = setInterval(() => {
       timerVariable.seconds++;
@@ -140,8 +145,14 @@
     }, 1000);
   }
 
-  function stopTimer(timerVariable) {
-    clearInterval(timerVariable.interval);
+  function stopTimer(timerElement, timerVariable) {
+    if (timerVariable.interval) {
+      clearInterval(timerVariable.interval);
+      timerVariable.interval = null; // Clear the interval reference
+
+      // Update the timer element to show where it stopped
+      timerElement.textContent = `Stopped at: ${timerVariable.seconds}s`;
+    }
   }
 
   // Lock and unlock actions for the left device
@@ -151,7 +162,7 @@
       statusLeft.textContent = 'Status: Locked';
       statusLeft.classList.add('locked');
       statusLeft.classList.remove('unlocked');
-      stopTimer(leftTimer);
+      stopTimer(timerLeft, leftTimer); // Stop the timer when locked and show where it stopped
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
@@ -163,8 +174,7 @@
       statusLeft.textContent = 'Status: Unlocked';
       statusLeft.classList.add('unlocked');
       statusLeft.classList.remove('locked');
-      leftTimer = { seconds: 0, interval: null };
-      startTimer(timerLeft, leftTimer);
+      startTimer(timerLeft, leftTimer); // Start the timer when unlocked
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
@@ -177,7 +187,7 @@
       statusRight.textContent = 'Status: Locked';
       statusRight.classList.add('locked');
       statusRight.classList.remove('unlocked');
-      stopTimer(rightTimer);
+      stopTimer(timerRight, rightTimer); // Stop the timer when locked and show where it stopped
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
@@ -189,12 +199,12 @@
       statusRight.textContent = 'Status: Unlocked';
       statusRight.classList.add('unlocked');
       statusRight.classList.remove('locked');
-      rightTimer = { seconds: 0, interval: null };
-      startTimer(timerRight, rightTimer);
+      startTimer(timerRight, rightTimer); // Start the timer when unlocked
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
   });
+
 </script>
 </body>
 </html>
